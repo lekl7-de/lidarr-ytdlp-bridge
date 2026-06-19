@@ -62,8 +62,6 @@ This is useful for age-restricted or region-locked content. If the file is not p
 
 → The "Test" button should succeed.
 
-After that, simply open an album and run **Interactive Search**, or let **Auto Search** do its job. The YouTube results will appear just like regular releases.
-
 ### Add the Indexer
 
 `Settings → Indexers → Add (+) → Torznab → Generic Torznab`
@@ -82,6 +80,9 @@ After that, simply open an album and run **Interactive Search**, or let **Auto S
 ! Make sure you select the correct download client.
 
 <img width="526" height="99" alt="screenshot" src="https://github.com/user-attachments/assets/1efb67f1-fa8f-4be8-800c-1ff6d8035618" />
+
+
+After that, simply open an album and run **Interactive Search**, or let **Auto Search** do its job. The YouTube results will appear just like regular releases.
 
 
 ## Known Limitations
