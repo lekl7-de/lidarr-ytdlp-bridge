@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  lidarr-ytdlp-bridge:
+    build: ./lidarr-ytdlp-bridge
+    container_name: lidarr-ytdlp-bridge
+    restart: unless-stopped
+    environment:
+      - API_KEY=supersecretkey123                       # API key for the Tornzab Indexer in Lidarr
+      - QBIT_USERNAME=admin                             # Username for qBittorrent in Lidarr
+      - QBIT_PASSWORD=adminadmin                        # Username for qBittorrent in Lidarr
+      - DOWNLOAD_DIR=/downloads                         
+      - COOKIES_FILE=/config/cookies.txt                # Cookie file
+      - SEARCH_LIMIT=10                                 # YouTube search limit
+    volumes:
+      - /path/to/lidarr/downloads:/downloads            # It MUST be the same host path as for lidarr
+      - /path/to/cookies.txt:/config/cookies.txt:ro     # optional: cookies.txt 
+    ports:
+      - "9117:9117"
