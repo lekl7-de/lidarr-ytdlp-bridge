@@ -10,6 +10,44 @@ from mutagen.id3 import ID3, APIC, error as ID3Error
 from config import COOKIES_FILE, DOWNLOAD_DIR, SEARCH_LIMIT
 
 
+# YouTube haengt bei automatisch generierten Kuenstler-Kanaelen "- Topic" an
+# den Channel-Namen an. Das verwirrt Lidarrs Artist/Album-Parsing, wenn es
+# einfach mit in den Titel uebernommen wird ("Artist - Topic - Songname").
+_TOPIC_SUFFIX_RE = re.compile(r"\s*-\s*topic\s*$", re.IGNORECASE)
+
+# Uebliche YouTube-Titel-Anhaengsel, die fuer Lidarrs Release-Parsing nur
+# Rauschen sind und teils sogar wie (falsche) Edition/Group-Tags aussehen.
+_NOISE_PATTERNS = [
+    re.compile(r"\(\s*official\s*(music\s*)?video\s*\)", re.IGNORECASE),
+    re.compile(r"\(\s*official\s*audio\s*\)", re.IGNORECASE),
+    re.compile(r"\(\s*official\s*\)", re.IGNORECASE),
+    re.compile(r"\(\s*lyrics?\s*(video)?\s*\)", re.IGNORECASE),
+    re.compile(r"\(\s*visualizer\s*\)", re.IGNORECASE),
+    re.compile(r"\(\s*audio\s*\)", re.IGNORECASE),
+    re.compile(r"\(\s*hd\s*\)", re.IGNORECASE),
+    re.compile(r"\(\s*4k\s*\)", re.IGNORECASE),
+    re.compile(r"\[\s*official\s*(music\s*)?video\s*\]", re.IGNORECASE),
+    re.compile(r"\[\s*official\s*audio\s*\]", re.IGNORECASE),
+    re.compile(r"\[\s*lyrics?\s*(video)?\s*\]", re.IGNORECASE),
+    re.compile(r"\[\s*visualizer\s*\]", re.IGNORECASE),
+    re.compile(r"\[\s*hd\s*\]", re.IGNORECASE),
+    re.compile(r"\[\s*4k\s*\]", re.IGNORECASE),
+    re.compile(r"\|\s*official.*$", re.IGNORECASE),
+]
+
+
+def _clean_uploader(uploader: str) -> str:
+    return _TOPIC_SUFFIX_RE.sub("", uploader or "").strip()
+
+
+def _clean_title(title: str) -> str:
+    t = title or ""
+    for pattern in _NOISE_PATTERNS:
+        t = pattern.sub("", t)
+    t = re.sub(r"\s{2,}", " ", t)
+    return t.strip(" -|")
+
+
 def _common_opts() -> dict:
     opts = {"quiet": True, "no_warnings": True, "noplaylist": True}
     if os.path.isfile(COOKIES_FILE):
@@ -30,15 +68,26 @@ def search_youtube(query: str, limit: int | None = None) -> list[dict]:
             if not entry:
                 continue
             video_id = entry.get("id")
-            title = entry.get("title") or "Unknown"
-            uploader = entry.get("uploader") or entry.get("channel") or ""
+            raw_title = entry.get("title") or "Unknown"
+            raw_uploader = entry.get("uploader") or entry.get("channel") or ""
             duration = entry.get("duration") or 0
-            full_title = f"{uploader} - {title}".strip(" -") or title
+
+            uploader = _clean_uploader(raw_uploader)
+            clean_video_title = _clean_title(raw_title)
+
+            full_title = f"{uploader} - {clean_video_title}".strip(" -") or clean_video_title
+
+            # Erscheinungsjahr mitgeben, falls vorhanden -- hilft Lidarr beim
+            # Zuordnen zum richtigen (Single-)Album in seiner Datenbank.
+            upload_date = entry.get("upload_date")  # Format: YYYYMMDD
+            if upload_date and len(upload_date) >= 4:
+                full_title = f"{full_title} ({upload_date[:4]})"
+
             # Pseudo-Release-Tag anhaengen, damit Lidarrs Qualitaets-Parser
             # etwas Bekanntes erkennt (MP3-320 ist eine gueltige Standard-
             # Bitratenstufe, im Gegensatz zu z.B. "MP3-250") und man ueber
-            # Custom Formats gezielt auf die Releasegruppe "yt-dlp" matchen kann.
-            release_title = f"{full_title} - mp3-320-ytdlp"
+            # Custom Formats gezielt auf die Releasegruppe "ytdlp" matchen kann.
+            release_title = f"{full_title}.MP3-320-ytdlp"
 
             # Groesse grob schaetzen (fuer die Anzeige in Lidarr), echte MP3-Groesse
             # kennen wir erst nach dem Download. ~320kbps Annahme.
