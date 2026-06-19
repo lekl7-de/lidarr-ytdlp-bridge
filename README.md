@@ -29,13 +29,9 @@ This is useful for age-restricted or region-locked content. If the file is not p
 
 ## Setup
 
-1. Place this folder (`lidarr-ytdlp-bridge/`) next to your existing `docker-compose.yml`.
+1. Download this repository and configure your own `docker-compose.yml` file. Use `docker-compose.example.yml` as a template
 
-2. Use `docker-compose.example.yml` as a template and merge it into your existing Compose configuration.
-
-   **Important:** Both the bridge container and Lidarr must mount the same host path for `/downloads`. If they do, Lidarr does not require any "Remote Path Mapping".
-
-3. Adjust the following values:
+2. Adjust the following values:
 
    * `API_KEY`
    * `QBIT_USERNAME`
@@ -43,7 +39,7 @@ This is useful for age-restricted or region-locked content. If the file is not p
 
    These values can be chosen freely, but make sure to remember them—you will need them when configuring Lidarr.
 
-4. Start the service:
+3. Start the service:
 
    ```bash
    docker compose up -d --build lidarr-ytdlp-bridge
@@ -58,7 +54,7 @@ This is useful for age-restricted or region-locked content. If the file is not p
 | Field          | Value                             |
 | -------------- | --------------------------------- |
 | Name           | YT-DLP Bridge                     |
-| URL            | `http://lidarr-ytdlp-bridge:9117` |
+| URL            | `http://<your-ip>:9117`           |
 | API Path       | `/api`                            |
 | API Key        | your `API_KEY`                    |
 | Categories     | `3000` (Audio)                    |
@@ -73,7 +69,7 @@ This is useful for age-restricted or region-locked content. If the file is not p
 | Field    | Value                  |
 | -------- | ---------------------- |
 | Name     | YT-DLP Downloader      |
-| Host     | `lidarr-ytdlp-bridge`  |
+| Host     | `<your-ip>`            |
 | Port     | `9117`                 |
 | Username | your `QBIT_USERNAME`   |
 | Password | your `QBIT_PASSWORD`   |
@@ -103,3 +99,9 @@ After that, simply open an album and run **Interactive Search**, or let **Auto S
 | `DOWNLOAD_DIR`  | `/downloads`          | Destination directory for completed MP3 files  |
 | `COOKIES_FILE`  | `/config/cookies.txt` | Optional cookies.txt file                      |
 | `SEARCH_LIMIT`  | `20`                  | Number of search results returned per request  |
+
+## disclaimer
+
+This project is mostly Vibecoded. I don't care what you think about that.
+
+If you find a bug, report it or fix it and send a request.
