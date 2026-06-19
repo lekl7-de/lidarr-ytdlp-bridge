@@ -78,7 +78,8 @@ After that, simply open an album and run **Interactive Search**, or let **Auto S
 | Search Options | Leave all enabled                 |
 
 → The "Test" button should succeed.
-! make shure you select the right download client
+
+! Make sure you select the correct download client.
 
 <img width="526" height="99" alt="screenshot" src="https://github.com/user-attachments/assets/1efb67f1-fa8f-4be8-800c-1ff6d8035618" />
 
