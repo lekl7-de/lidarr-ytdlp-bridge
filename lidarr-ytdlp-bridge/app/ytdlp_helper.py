@@ -34,9 +34,11 @@ def search_youtube(query: str, limit: int | None = None) -> list[dict]:
             uploader = entry.get("uploader") or entry.get("channel") or ""
             duration = entry.get("duration") or 0
             full_title = f"{uploader} - {title}".strip(" -") or title
-            # Pseudo-Release-Tag anhaengen, damit man in Lidarr ueber Custom
-            # Formats gezielt auf "ytdlp"/"MP3-250" matchen/scoren kann.
-            release_title = f"{full_title}.MP3-250-YTDLP"
+            # Pseudo-Release-Tag anhaengen, damit Lidarrs Qualitaets-Parser
+            # etwas Bekanntes erkennt (MP3-320 ist eine gueltige Standard-
+            # Bitratenstufe, im Gegensatz zu z.B. "MP3-250") und man ueber
+            # Custom Formats gezielt auf die Releasegruppe "yt-dlp" matchen kann.
+            release_title = f"{full_title} - mp3-320-ytdlp"
 
             # Groesse grob schaetzen (fuer die Anzeige in Lidarr), echte MP3-Groesse
             # kennen wir erst nach dem Download. ~320kbps Annahme.
