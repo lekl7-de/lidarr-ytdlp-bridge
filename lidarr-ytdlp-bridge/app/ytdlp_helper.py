@@ -48,6 +48,18 @@ def _clean_title(title: str) -> str:
     return t.strip(" -|")
 
 
+def _title_has_artist_prefix(uploader: str, video_title: str) -> bool:
+    """Prüft, ob der Video-Titel bereits "Artist - Track" enthält (z.B. bei
+    offiziellen Künstlerkanälen), damit wir den Kanalnamen nicht nochmal
+    davorsetzen ("d4vd - d4vd - Songname")."""
+    if not uploader:
+        return False
+    parts = re.split(r"\s*[-–—]\s*", video_title, maxsplit=1)
+    if len(parts) != 2:
+        return False
+    return parts[0].strip().lower() == uploader.strip().lower()
+
+
 def _common_opts() -> dict:
     opts = {"quiet": True, "no_warnings": True, "noplaylist": True}
     if os.path.isfile(COOKIES_FILE):
@@ -75,7 +87,10 @@ def search_youtube(query: str, limit: int | None = None) -> list[dict]:
             uploader = _clean_uploader(raw_uploader)
             clean_video_title = _clean_title(raw_title)
 
-            full_title = f"{uploader} - {clean_video_title}".strip(" -") or clean_video_title
+            if _title_has_artist_prefix(uploader, clean_video_title):
+                full_title = clean_video_title
+            else:
+                full_title = f"{uploader} - {clean_video_title}".strip(" -") or clean_video_title
 
             # Erscheinungsjahr mitgeben, falls vorhanden -- hilft Lidarr beim
             # Zuordnen zum richtigen (Single-)Album in seiner Datenbank.
@@ -87,7 +102,7 @@ def search_youtube(query: str, limit: int | None = None) -> list[dict]:
             # etwas Bekanntes erkennt (MP3-320 ist eine gueltige Standard-
             # Bitratenstufe, im Gegensatz zu z.B. "MP3-250") und man ueber
             # Custom Formats gezielt auf die Releasegruppe "ytdlp" matchen kann.
-            release_title = f"{full_title}.MP3-320-ytdlp"
+            release_title = f"{full_title}.MP3-256-ytdlp"
 
             # Groesse grob schaetzen (fuer die Anzeige in Lidarr), echte MP3-Groesse
             # kennen wir erst nach dem Download. ~320kbps Annahme.
