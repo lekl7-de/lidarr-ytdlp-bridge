@@ -85,6 +85,20 @@ This is useful for age-restricted or region-locked content. If the file is not p
 After that, simply open an album and run **Interactive Search**, or let **Auto Search** do its job. The YouTube results will appear just like regular releases.
 
 
+## Automatic Cleanup
+
+The bridge can automatically delete downloaded files after a configurable amount of time. This is useful when Lidarr imports files by **copy** (the default) and the original in the download directory is no longer needed.
+
+Configure via the `CLEANUP_AFTER` environment variable:
+
+```yaml
+environment:
+  - CLEANUP_AFTER=3600   # delete 1 hour after download completes
+  # - CLEANUP_AFTER=0    # never delete (default: 3600)
+```
+
+The cleanup runs once per minute and only removes files that were downloaded by this bridge — it will never touch unrelated files in the download directory.
+
 ## Known Limitations
 
 * The **file size** shown during search is only an approximation (duration × 320 kbps), since the actual file size is unknown until the download completes. This does not bother Lidarr, but it may affect quality/size profiles if you have strict limits configured.
@@ -97,14 +111,15 @@ After that, simply open an album and run **Interactive Search**, or let **Auto S
 
 ## Environment Variables
 
-| Variable        | Default               | Description                                    |
-| --------------- | --------------------- | ---------------------------------------------- |
-| `API_KEY`       | `changeme`            | API key for the indexer                        |
-| `QBIT_USERNAME` | `admin`               | Login username for the fake qBittorrent client |
-| `QBIT_PASSWORD` | `adminadmin`          | Password for the fake qBittorrent client       |
-| `DOWNLOAD_DIR`  | `/downloads`          | Destination directory for completed MP3 files  |
-| `COOKIES_FILE`  | `/config/cookies.txt` | Optional cookies.txt file                      |
-| `SEARCH_LIMIT`  | `20`                  | Number of search results returned per request  |
+| Variable        | Default               | Description                                                                 |
+| --------------- | --------------------- | --------------------------------------------------------------------------- |
+| `API_KEY`       | `changeme`            | API key for the indexer                                                     |
+| `QBIT_USERNAME` | `admin`               | Login username for the fake qBittorrent client                              |
+| `QBIT_PASSWORD` | `adminadmin`          | Password for the fake qBittorrent client                                    |
+| `DOWNLOAD_DIR`  | `/downloads`          | Destination directory for completed MP3 files                               |
+| `COOKIES_FILE`  | `/config/cookies.txt` | Optional cookies.txt file                                                   |
+| `SEARCH_LIMIT`  | `20`                  | Number of search results returned per request                               |
+| `CLEANUP_AFTER` | `3600`                | Seconds after completion until downloaded files are deleted. `0` = never.  |
 
 ## disclaimer
 

@@ -1,5 +1,7 @@
 import os
 
+VERSION = "1.6.0"
+
 # API-Key, den Lidarr beim Indexer mitschicken muss
 API_KEY = os.environ.get("API_KEY", "changeme")
 
@@ -20,3 +22,7 @@ SEARCH_LIMIT = int(os.environ.get("SEARCH_LIMIT", "20"))
 PORT = int(os.environ.get("PORT", "9117"))
 
 INDEXER_NAME = os.environ.get("INDEXER_NAME", "YT-DLP Bridge")
+
+# Sekunden nach Abschluss bis die heruntergeladene Datei automatisch geloescht wird.
+# 0 = nie loeschen.
+CLEANUP_AFTER = int(os.environ.get("CLEANUP_AFTER", "3600"))
